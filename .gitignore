@@ -1,0 +1,10 @@
+*.pdf
+subject.txt
+*.tgz
+.venv/
+__pycache__/
+.mypy_cache/
+data/
+models/
+*.joblib
+.env
