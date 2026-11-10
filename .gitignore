@@ -1,5 +1,4 @@
 *.pdf
-subject.txt
 *.tgz
 .venv/
 __pycache__/
