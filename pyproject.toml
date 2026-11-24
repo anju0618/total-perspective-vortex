@@ -17,3 +17,7 @@ dev = [
     "flake8>=7.4.1",
     "mypy>=2.4.0",
 ]
+
+[[tool.mypy.overrides]]
+module = ["mne", "mne.*", "dotenv", "sklearn", "sklearn.*"]
+ignore_missing_imports = true

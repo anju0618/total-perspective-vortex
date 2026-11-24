@@ -1,4 +1,4 @@
-"""Load EEG of the physionet motor imagery dataset with MNE."""
+"""physionet の運動イメージの脳波を、MNE で読み込む"""
 
 import os
 from pathlib import Path
@@ -24,10 +24,18 @@ def fetch(subject: int, runs: list[int]) -> list[str]:
     return eegbci.load_data(subject, runs, path=DATA_DIR, update_path=False)
 
 
-def save_figs(raw: mne.io.BaseRaw, name: str, width: int = 30) -> None:
-    """Save the raw plot in chunks of `width` seconds.
+def load_raw(subject: int, run: int) -> mne.io.BaseRaw:
+    """記録を1つ取ってきて、Raw オブジェクトとして読む"""
+    path = fetch(subject, [run])[0]
+    raw = mne.io.read_raw_edf(path, preload=True, verbose=False)
+    eegbci.standardize(raw)  # "C3.." → "C3"（標準のチャンネル名にそろえる）
+    return raw
 
-    Files: FIG_DIR/name/name_000.png, name_030.png, ...
+
+def save_figs(raw: mne.io.BaseRaw, name: str, width: int = 30) -> None:
+    """波形を `width` 秒ずつに区切って、図を何枚かに分けて保存する
+
+    保存先：FIG_DIR/name/name_000.png, name_030.png, ...
     """
     out = FIG_DIR / name
     out.mkdir(parents=True, exist_ok=True)

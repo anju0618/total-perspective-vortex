@@ -63,6 +63,17 @@ run の構成とイベントの印の意味は PhysioNet のページで確認�
 
 ## 参考
 
+### PDF（`reference/`）
+
+| ファイル | 内容 |
+|---|---|
+| `BCI入門チュートリアル_Bonci2021.pdf` | BCI の信号計測と処理の入門（英語、Electronics 誌のレビュー） |
+| `BMI講義スライド_ATR山下.pdf` | ブレイン・マシン・インタフェースの講義スライド（ATR 山下） |
+| `アルファ波BCI_新潟大学堀研.pdf` | α波帯域に着目した BCI のスライド（新潟大学 堀研） |
+| `ERDを用いたBCI提案_和歌山大学2017.pdf` | 事象関連脱同期（ERD）を使った BCI の成果報告書（和歌山大学） |
+
+### リンク
+
 [scikit-learn pipelineによる前処理を概観する](https://qiita.com/suikabar/items/88d1fb702ed289a5a3ee)
 
 [MNE-Python の使い方 運動想起の解析](https://qiita.com/ponpopon_pon/items/32e931058841acc7dee5)
@@ -72,3 +83,5 @@ run の構成とイベントの印の意味は PhysioNet のページで確認�
 [PythonでEDFファイルを読み込む方法](https://qiita.com/tchkwkzk/items/0e4e6cb1e29436c843c9)
 
 [Overview of MEG/EEG analysis with MNE-Python](https://mne.tools/stable/auto_tutorials/intro/10_overview.html)
+
+[10–20 system (EEG)](https://en.wikipedia.org/wiki/10%E2%80%9320_system_(EEG))
