@@ -11,19 +11,51 @@ import matplotlib.pyplot as plt
 
 load_dotenv()
 DATA_DIR = Path(os.environ.get("DATA_DIR", "data"))
+FIG_DIR = Path(os.environ.get("FIG_DIR", "figures"))
 
 
 def fetch(subject: int, runs: list[int]) -> list[str]:
+    """
+    subject: 1~109
+    runs: 1~14
+    """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
     return eegbci.load_data(subject, runs, path=DATA_DIR, update_path=False)
 
 
+def save_figs(raw: mne.io.BaseRaw, name: str, width: int = 30) -> None:
+    """Save the raw plot in chunks of `width` seconds.
+
+    Files: FIG_DIR/name/name_000.png, name_030.png, ...
+    """
+    out = FIG_DIR / name
+    out.mkdir(parents=True, exist_ok=True)
+    total = raw.times[-1]
+    for start in range(0, int(total), width):
+        fig = raw.plot(start=start, duration=min(width, total - start),
+                       n_channels=len(raw.ch_names), show=False)
+        fig.set_size_inches(20, 12)
+        fig.savefig(out / f"{name}_{start:03d}.png")
+        plt.close(fig)
+
+
 def read_mne():
-    paths = fetch(4, [14])
-    raw = mne.io.read_raw_edf(paths[0], preload=True)
+
+    x = 0
+    print(f"{'=' * 20} fetching raw data {'=' * 20}")
+    paths = fetch(1, [14])
+    raw = mne.io.read_raw_edf(paths[x], preload=True)
+
+    print(f"\n\n{'=' * 20} print raw annotation {'=' * 20}")
+    print(raw.annotations)
+
+    print(f"\n\n{'=' * 10} loading {paths[x]} data {'=' * 10}")
     print(raw.info)
-    raw.plot()
-    plt.show()
+
+    print(f"\n\n{'=' * 10} printing psd {'=' * 10}")
+    raw.compute_psd().plot()
+    save_figs(raw, Path(paths[x]).stem)
 
 
 if __name__ == "__main__":

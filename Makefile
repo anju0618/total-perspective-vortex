@@ -16,7 +16,7 @@ help:
 	@echo "make lint       flake8"
 	@echo "make typecheck  mypy"
 	@echo "make check      lint + typecheck"
-	@echo "make clean      remove caches and trained models"
+	@echo "make clean      remove caches, trained models, downloaded data and figures"
 	@echo "make fclean     clean + remove .venv"
 	@echo "make re         fclean + install"
 	@echo ""
@@ -46,7 +46,7 @@ typecheck:
 check: lint typecheck
 
 clean:
-	rm -rf models .mypy_cache
+	rm -rf models data figures .mypy_cache
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
 
 fclean: clean
