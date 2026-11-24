@@ -1,5 +1,7 @@
 """フィルタと特徴の取り出し（周波数帯、エポック）"""
 
+import sys
+
 import mne
 import numpy as np
 
@@ -38,3 +40,59 @@ def get_xy(raw: mne.io.BaseRaw) -> tuple[np.ndarray, np.ndarray]:
     """
     epochs = make_epochs(filter_raw(raw))
     return epochs.get_data(copy=True), epochs.events[:, 2]
+
+
+def band_ratio(raw: mne.io.BaseRaw,
+               l_freq: float = L_FREQ,
+               h_freq: float = H_FREQ) -> float:
+    """帯域の中のパワー / 帯域の外のパワー（フィルタが効いたかの目安）"""
+    psd = raw.compute_psd(fmin=1.0, fmax=70.0, verbose=False)
+    power = psd.get_data().mean(axis=0)  # チャンネルの平均
+    inside = (psd.freqs >= l_freq) & (psd.freqs <= h_freq)
+    return float(power[inside].sum() / power[~inside].sum())
+
+
+def main() -> None:
+    """チェック用：python src/tpv/preprocessing.py <subject> <run>"""
+    from collections import Counter
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from tpv.data import load_raw
+
+    subject = int(sys.argv[1]) if len(sys.argv) > 1 else 4
+    run = int(sys.argv[2]) if len(sys.argv) > 2 else 14
+
+    print(f"{'=' * 20} load subject {subject}, run {run} {'=' * 20}")
+    raw = load_raw(subject, run)
+    print(f"channels: {len(raw.ch_names)}, "
+          f"sfreq: {raw.info['sfreq']} Hz, "
+          f"length: {raw.times[-1]:.1f} s")
+    print(f"annotations: {raw.annotations}")
+
+    print(f"\n{'=' * 20} filter {L_FREQ}-{H_FREQ} Hz {'=' * 20}")
+    filtered = filter_raw(raw)
+    print(f"in-band / out-of-band power  raw: {band_ratio(raw):.3f}  "
+          f"filtered: {band_ratio(filtered):.3f}")
+    assert band_ratio(filtered) > band_ratio(raw), "filter had no effect"
+
+    print(f"\n{'=' * 20} epochs {'=' * 20}")
+    epochs = make_epochs(filtered)
+    print(epochs)
+
+    print(f"\n{'=' * 20} get_xy {'=' * 20}")
+    X, y = get_xy(raw)
+    print(f"X shape: {X.shape}  (epochs, channels, times)")
+    print(f"y shape: {y.shape}, classes: {dict(sorted(Counter(y).items()))}")
+    assert X.shape[0] == y.shape[0], "X and y have different lengths"
+    assert set(y) <= set(EVENT_ID.values()), "unexpected label in y"
+    assert not np.isnan(X).any(), "X has NaN"
+    print("OK")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)

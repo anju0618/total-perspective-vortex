@@ -1,6 +1,7 @@
 """physionet の運動イメージの脳波を、MNE で読み込む"""
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -67,4 +68,8 @@ def read_mne():
 
 
 if __name__ == "__main__":
-    read_mne()
+    try:
+        read_mne()
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
