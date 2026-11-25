@@ -14,7 +14,8 @@ from tpv.csp import CSP
 
 def test_csp_fit() -> None:
     X, y = get_xy(load_raw(4, 14))
-    print(CSP(4).fit(X, y).filters_.shape)
+    csp = CSP(4).fit(X, y)
+    print(csp.filters_.shape)
 
 
 def test_eigval() -> None:

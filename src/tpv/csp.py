@@ -15,7 +15,7 @@ w = (1, -1)が引く
 """
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
-import scipy
+from scipy import linalg
 
 
 class CSP(BaseEstimator, TransformerMixin):  # type: ignore[misc]
@@ -24,7 +24,7 @@ class CSP(BaseEstimator, TransformerMixin):  # type: ignore[misc]
     """
     def __init__(self, n_components: int = 4) -> None:
         if n_components % 2 != 0 or n_components < 2:
-            raise ValueError("n_components shold be positive even num")
+            raise ValueError("n_components should be positive even num")
 
         self.n_components = n_components
 
@@ -48,7 +48,7 @@ class CSP(BaseEstimator, TransformerMixin):  # type: ignore[misc]
 
         return np.mean(res, axis=0)
 
-    def fit(self, X, y):  # type: ignore[no-untyped-def]
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "CSP":
         if self.n_components % 2 != 0:
             raise ValueError("n_components should be even number")
 
@@ -61,7 +61,13 @@ class CSP(BaseEstimator, TransformerMixin):  # type: ignore[misc]
             Ci = self._class_covariance(X, y, i)
             C.append(Ci)
 
-        eigvals, eigvecs = scipy.linalg.eigh(C[0], C[0] + C[1])
+        eigvals, eigvecs = linalg.eigh(C[0], C[0] + C[1])
+
+        half = self.n_components // 2
+        min_w = eigvecs[:, :half]
+        max_w = eigvecs[:, -half:]
+        self.filters_ = np.hstack([min_w, max_w]).T
+        return self
 
     def transform(self, X):  # type: ignore[no-untyped-def]
         raise NotImplementedError
