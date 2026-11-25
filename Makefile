@@ -2,7 +2,7 @@ PYTHON	= uv run python
 SUBJECT	= 4
 RUN	= 14
 
-.PHONY: all install visualize train predict eval lint typecheck check \
+.PHONY: all install visualize train predict eval test lint typecheck check \
 	clean fclean re help
 
 all: help
@@ -13,6 +13,7 @@ help:
 	@echo "make train      train on subject $(SUBJECT), run $(RUN)"
 	@echo "make predict    predict as a stream on subject $(SUBJECT), run $(RUN)"
 	@echo "make eval       mean accuracy over all subjects and the 6 experiments"
+	@echo "make test       pytest (tests/)"
 	@echo "make lint       flake8"
 	@echo "make typecheck  mypy"
 	@echo "make check      lint + typecheck"
@@ -36,6 +37,9 @@ predict:
 
 eval:
 	$(PYTHON) mybci.py
+
+test:
+	uv run pytest
 
 lint:
 	uv run flake8 mybci.py src
